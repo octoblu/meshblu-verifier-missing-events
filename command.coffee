@@ -1,8 +1,7 @@
 MissingEvents = require './missing-events-verifier'
 
-
-
 missingEvents = new MissingEvents()
 
 
-missingEvents.setupDevices =>
+missingEvents.setupDevices (error) =>
+  console.error error.stack if error?
