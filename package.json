@@ -1,0 +1,17 @@
+{
+  "name": "missing-events-verifier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "meshblu-config": "^7.0.0",
+    "meshblu-firehose-socket.io": "^4.0.0",
+    "meshblu-http": "^9.8.0"
+  }
+}
