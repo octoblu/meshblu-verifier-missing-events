@@ -1,12 +1,11 @@
 _                   = require 'lodash'
 async               = require 'async'
-MeshbluFirehose     = require 'meshblu-firehose-socket.io'
 MeshbluHttp         = require 'meshblu-http'
 MeshbluConfig       = require 'meshblu-config'
-EmitterTemplate     = require './templates/emitter-device'
-SubscriberTemplate  = require './templates/subscriber-device'
+EmitterTemplate     = require '../templates/emitter-template'
+SubscriberTemplate  = require '../templates/subscriber-template'
 
-class MissingEventsVerifier
+class MissingEventsVerifierSetup
   setupDevices: (callback) =>
     meshbluHttp = new MeshbluHttp new MeshbluConfig().toJSON()
     meshbluHttp.register SubscriberTemplate(), (error, @subscriberAuth) =>
@@ -21,14 +20,8 @@ class MissingEventsVerifier
       return callback error if error?
 
       @_setupSubscriberSubscriptions (error) =>
-
-        emitterMeshblu = new MeshbluHttp @emitterAuth
-        emitterMeshblu.subscriptions @emitterAuth.uuid, (error, subscriptions) =>
-          console.log JSON.stringify subscriptions, null, 2
-
-        subscriberMeshblu = new MeshbluHttp @subscriberAuth
-        subscriberMeshblu.subscriptions @subscriberAuth.uuid, (error, subscriptions) =>
-          console.log JSON.stringify subscriptions, null, 2
+        return callback error if error?
+        return callback null, {@subscriberAuth, @emitterAuth}
 
   _setupEmitterSubscriptions: (callback) =>
     emitterMeshblu = new MeshbluHttp @emitterAuth
@@ -47,4 +40,4 @@ class MissingEventsVerifier
     ]
     async.each subscriberSubscriptions, subscriberMeshblu.createSubscription, callback
 
-module.exports = MissingEventsVerifier
+module.exports = MissingEventsVerifierSetup

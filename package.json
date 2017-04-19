@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.3.0",
+    "eventemitter2": "^4.1.0",
     "lodash": "^4.17.4",
     "meshblu-config": "^7.0.0",
     "meshblu-firehose-socket.io": "^4.0.0",
