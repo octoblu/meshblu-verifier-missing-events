@@ -1,4 +1,5 @@
 _                   = require 'lodash'
+moment              = require 'moment'
 MissingEventsSetup  = require './src/missing-events-verifier-setup'
 EmitterDevice       = require './src/emitter-device'
 SubscriberDevice    = require './src/subscriber-device'
@@ -6,20 +7,22 @@ SubscriberDevice    = require './src/subscriber-device'
 class Command
   constructor: ->
     @times = 0
+    @start = Date.now()
     @missingEventsSetup  = new MissingEventsSetup()
 
   missedMessage: =>
-    console.error "Didn't see a config event after #{times} times"
+    console.error "Didn't see a config event after #{@times} times"
     process.exit -1
 
   change: ({data}={}) =>
     @changedTwice = _.after 2, @change
-
+    duration = Date.now() - @start
     @times = data?.timesChanged || 0
-    console.log @times
+    console.log "#{@times} : #{duration}"
     clearTimeout @deadmanSwitch
-    @deadmanSwitch = setTimeout @missedMessage, 5000
-
+    @deadmanSwitch = setTimeout @missedMessage, 10000
+    
+    @start = Date.now()
     @emitter.change (error) =>
       if error?
         console.error "ERROR CHANGING!"
@@ -32,21 +35,21 @@ class Command
         console.error error.stack
         process.exit -1
 
-      @emitter     = new EmitterDevice emitterAuth
-      @subscriber  = new SubscriberDevice subscriberAuth
+      @emitter      = new EmitterDevice emitterAuth
+      @subscriber   = new SubscriberDevice subscriberAuth
       @changedTwice = _.after 2, @change
 
       @emitter.listen =>
         console.log 'emitter listened'
         @emitter.on 'message', (data) =>
-          process.stdout.write 'E'
+          process.stdout.write 'E '
           @changedTwice data
 
         @subscriber.listen =>
           console.log 'subscriber listened'
 
           @subscriber.on 'message', (data) =>
-            process.stdout.write 'S'
+            process.stdout.write 'S '
             @changedTwice data
           @change()
 
