@@ -21,7 +21,12 @@ class MissingEventsVerifierSetup
 
       @_setupSubscriberSubscriptions (error) =>
         return callback error if error?
-        return callback null, {@subscriberAuth, @emitterAuth}
+        subscriberAuth = _.pick @subscriberAuth, 'uuid', 'token'
+        subscriberAuth.resolveSrv = true
+
+        emitterAuth = _.pick @emitterAuth, 'uuid', 'token'
+        emitterAuth.resolveSrv = true
+        return callback null, {subscriberAuth, emitterAuth}
 
   _setupEmitterSubscriptions: (callback) =>
     emitterMeshblu = new MeshbluHttp @emitterAuth
