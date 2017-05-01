@@ -5,7 +5,6 @@ EmitterDevice       = require './src/emitter-device'
 SubscriberDevice    = require './src/subscriber-device'
 stats               = require 'simple-statistics'
 
-
 MAX_SIZE = 30
 class Command
   constructor: ->
@@ -42,6 +41,10 @@ class Command
         console.error error.stack
         process.exit -1
 
+  panic: (error) =>
+    console.error error.stack
+    process.exit 1
+
   printStats: (duration) =>
     return unless @history.length > 0
     console.log "##{@count}:"
@@ -51,7 +54,7 @@ class Command
     console.log "T: #{duration}. Average: #{stats.mean _.map @history, 'duration'}"
 
   run: =>
-    @missingEventsSetup.setupDevices (error, {subscriberAuth, emitterAuth}) =>
+    @missingEventsSetup.setupDevices (error, {subscriberAuth, emitterAuth}={}) =>
       if error?
         console.error error.stack
         process.exit -1
@@ -66,7 +69,8 @@ class Command
           @emitterTime = (Date.now() - @start) - @changeTime
           @changedTwice data
 
-        @subscriber.listen =>
+        @subscriber.listen (error) =>
+          return @panic error if error?
           console.log 'subscriber listened'
 
           @subscriber.on 'message', (data) =>

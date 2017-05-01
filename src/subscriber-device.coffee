@@ -4,6 +4,9 @@ MeshbluFirehose   = require 'meshblu-firehose-socket.io'
 class SubscriberDevice extends EventEmitter2
 
   constructor: (@meshbluAuth) ->
+    @meshbluAuth.port     = process.env.MESHBLU_FIREHOSE_PORT
+    @meshbluAuth.protocol = 'http'
+
     @firehose = new MeshbluFirehose meshbluConfig: @meshbluAuth
     @firehose.on 'message', (data) =>
       @emit 'message', data
